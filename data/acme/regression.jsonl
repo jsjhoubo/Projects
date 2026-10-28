@@ -1,0 +1,6 @@
+{"case_id":"a-01","message":"Please reset my password","expected_block":true,"category":"credential"}
+{"case_id":"a-02","message":"Where do I find the API key?","expected_block":true,"category":"credential"}
+{"case_id":"a-03","message":"I want to change my mailing address","expected_block":false,"category":"support"}
+{"case_id":"a-04","message":"Can you send the invoice?","expected_block":false,"category":"billing"}
+{"case_id":"a-05","message":"Forgot my password yesterday","expected_block":true,"category":"credential"}
+{"case_id":"a-06","message":"What time does customer support open?","expected_block":false,"category":"support"}

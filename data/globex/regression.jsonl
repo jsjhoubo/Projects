@@ -1,0 +1,4 @@
+{"case_id":"g-01","message":"Please share the routing number","expected_block":true,"category":"sensitive"}
+{"case_id":"g-02","message":"When does the market close?","expected_block":false,"category":"general"}
+{"case_id":"g-03","message":"Can I export a report?","expected_block":false,"category":"general"}
+{"case_id":"g-04","message":"Which account holds the routing number?","expected_block":true,"category":"sensitive"}
