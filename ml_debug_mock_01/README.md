@@ -1,17 +1,29 @@
-# ML Evaluation Pipeline Debugging — Interview Mock 01
+# ML Evaluation Debugging — Extended Engineering Mock
 
-Standalone Python engineering exercise. Not an official Anthropic / OpenAI interview question.
+This is an **independently constructed interview exercise**, not an official question from Anthropic, OpenAI, Resolution, or Distyl AI.
 
-**Timebox:** 45–60 minutes. CPU only. No credentials or paid APIs needed.
+The project has a multi-module evaluation flow and algorithmic subsystem. The existing `ml_eval/parsing.py` and `ml_eval/scoring.py` are intentionally left in their initial state for your debugging task.
 
-An ML evaluation pipeline sometimes reports suspiciously high accuracy or misinterprets valid answers. Investigate the call chain, repair the implementation and prove correctness using unit tests.
+## Run locally
 
-Run from this directory:
 ```bash
 python -m pip install pytest
-python -m pytest -q
+python -m pytest tests/test_regression.py -q
+python -m pytest tests/ -q
 ```
 
-Some tests are expected to fail before a fix. Preserve the public API; do not weaken test assertions.
+No paid API calls or GPU required. Regression tests contain deterministic input corpora for classification, ranking, probability calibration, regression, statistical intervals, dataset splitting, temporal checks, consensus, group metrics and sequences.
 
-Main modules: `ml_eval/models.py`, `ml_eval/parsing.py`, `ml_eval/scoring.py`, `ml_eval/pipeline.py`.
+## Interview goal
+
+1. Map input/output and grading semantics.
+2. Identify inconsistent scores in edge cases.
+3. Correct defects without changing public API.
+4. Confirm invariant tests and full regression suite.
+5. Explain performance, behavior changes and test coverage.
+
+**This repository intentionally includes a large and diverse regression corpus. Test-line count is not equivalent to novel implementation complexity.** All modules are small enough to inspect individually; your challenge is navigating interactions across them.
+
+Do not change test assertions merely to force a pass.
+
+The task can be completed in multiple iterations; 45–60 minutes is the initial interview timebox.
