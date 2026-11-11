@@ -46,7 +46,7 @@ Read `ml_eval/analytics/ranking.py` and the reference checks in `tests/test_algo
 
 ```bash
 python -m pytest tests/test_algorithm_contracts.py -q -k "ranking or ndcg or average_precision"
-python benchmarks/algorithm_baseline.py
+python -m benchmarks.algorithm_baseline
 ```
 
 The benchmark is diagnostic, not a flaky pass/fail test. Record baseline, complexity, improved timing, correctness, and memory cost.
