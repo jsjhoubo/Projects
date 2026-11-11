@@ -27,3 +27,6 @@ def _check_binary(labels):
     out=[int(x) for x in labels]
     if any(x not in (0,1) for x in out): raise ValueError("binary labels required")
     return out
+
+# Include internal helpers when analytics modules use `from ._core import *`.
+__all__ = ["math", "Counter", "defaultdict", "mean", "_pairs", "_safe_div", "_finite", "_check_binary"]
