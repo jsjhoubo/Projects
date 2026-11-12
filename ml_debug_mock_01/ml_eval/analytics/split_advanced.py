@@ -11,10 +11,24 @@ import random
 
 def group_stratified_split(records, *, group_key="user_id", label_key="label",
                            train_fraction=0.8, seed=17):
-    """Split complete groups, approximately preserving class distribution.
+    """Random GROUP-level assignment (baseline, NOT guaranteed stratification).
 
-    Returns train, validation in input-record format. Order within each
-    partition should preserve the original input order.
+    Discussion / contract (2026-11-11):
+    - Each record has exactly one discrete label; a group has a label histogram.
+    - Hard constraint: one group goes wholly to train OR wholly to validation.
+      No records may be duplicated or dropped, and partition order is stable.
+    - Desired train sample ratio and per-label proportions are SOFT objectives.
+      With skewed group sizes or group label histograms, even the globally
+      optimal binary assignment may not achieve them simultaneously.
+    - This baseline chooses approximately train_fraction of GROUP IDs, not
+      train_fraction of RECORDS. That is a valid group-preserving split, but
+      its name must not be interpreted as a stratification guarantee.
+    - If stronger stratification is required, define an explicit optimization
+      objective and acceptable tolerances before changing the implementation.
+      Never silently weaken group integrity or resample validation rows.
+
+    The current baseline implementation is deliberately unchanged so existing
+    debugging work can continue. Returns train, validation in input order.
     """
     if not 0 < train_fraction < 1:
         raise ValueError("train_fraction must be strictly between 0 and 1")
