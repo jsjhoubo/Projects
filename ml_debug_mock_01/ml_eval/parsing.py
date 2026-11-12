@@ -7,5 +7,5 @@ def extract_answer(text: str, mode: str) -> str | None:
     match = _STRICT.search(text) or _LOOSE.search(text)
     if not match:
         return None
-    result = match.group(1).strip().rstrip(".")
+    result = match.group(1).split()[0].strip().rstrip(".")
     return result.upper() if mode == "multiple_choice" else result.lower()

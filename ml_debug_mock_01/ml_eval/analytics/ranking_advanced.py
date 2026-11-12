@@ -2,6 +2,7 @@
 from __future__ import annotations
 from collections import defaultdict
 import math
+import heapq
 
 
 def group_ndcg_at_k(rows, k=10, *, query_key="query_id",
@@ -20,9 +21,12 @@ def group_ndcg_at_k(rows, k=10, *, query_key="query_id",
         return 0.0
     total = 0.0
     for query, group in by_query.items():
-        ordered = sorted(group, key=lambda z: (-z[1][score_key], z[0]))
+        # ordered = sorted(group, key=lambda z: (-z[1][score_key], z[0]))
+        ordered =heapq.nsmallest(k, group, key=lambda z: (-z[1][score_key], z[0]))
         labels = [pair[1][relevance_key] for pair in ordered[:k]]
-        all_labels = sorted((pair[1][relevance_key] for pair in group), reverse=True)[:k]
+        #all_labels = sorted((pair[1][relevance_key] for pair in group), reverse=True)[:k]
+        all_labels = heapq.nlargest(k, (pair[1][relevance_key] for pair in group))
+        
         def dcg(values):
             return sum((2**r - 1) / math.log2(i + 2) for i, r in enumerate(values))
         ideal = dcg(all_labels)
@@ -42,7 +46,7 @@ def deduplicate_candidates(rows, *, query_key="query_id", doc_key="doc_id",
         key = (row[query_key], row[doc_key])
         if key not in best:
             best[key] = row
-        elif row[score_key] >= best[key][score_key]:
+        elif row[score_key] > best[key][score_key]:
             best[key] = row
     return list(best.values())
 
@@ -60,8 +64,10 @@ def topk_per_query(rows, k, *, query_key="query_id", score_key="score"):
         by_query[row[query_key]].append((i, row))
     ranked = []
     for query, group in by_query.items():
-        group.sort(key=lambda pair: (-pair[1][score_key], pair[0]))
-        ranked.extend(row for _, row in group[:k])
+        topk = heapq.nsmallest(
+            k, group, key=lambda pair: (-pair[1][score_key], pair[0])
+        )
+        ranked.extend(row for _, row in topk)
     return ranked
 
 
@@ -74,5 +80,5 @@ def weighted_query_metric(query_metrics, query_weights):
     denominator = sum(query_weights.values())
     if denominator <= 0:
         return 0.0
-    return sum(score * weight for score, weight in
-               zip(query_metrics.values(), query_weights.values())) / denominator
+    return sum(score * query_weights[key] for key, score in
+               query_metrics.items()) / denominator

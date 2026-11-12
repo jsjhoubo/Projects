@@ -59,8 +59,11 @@ def best_split_exact(rows,grad,hess,*,reg_lambda=1.,gamma=0.,
     for f in range(d):
         ordered=sorted(((r[f],g,h) for r,g,h in zip(rows,grad,hess)
                         if not math.isnan(r[f])),key=lambda z:z[0])
+        # ordered [which bin, grad?, hession? ]
         missing=[(g,h) for r,g,h in zip(rows,grad,hess) if math.isnan(r[f])]
+        # missed: [grad?, hession]
         mg,mh,mc=sum(z[0] for z in missing),sum(z[1] for z in missing),len(missing)
+        # 
         gl=hl=0.
         for i in range(len(ordered)-1):
             x,g,h=ordered[i]
@@ -106,9 +109,16 @@ def best_split_histogram(rows,grad,hess,*,max_bins=16,reg_lambda=1.,
         columns.append([float("nan") if math.isnan(r[f]) else
                         min(max_bins-1,int((r[f]-lo)/width)) for r in rows])
     binned=list(zip(*columns))
-    return best_split_exact(binned,grad,hess,reg_lambda=reg_lambda,
+    split = best_split_exact(binned,grad,hess,reg_lambda=reg_lambda,
                             gamma=gamma,min_child_samples=min_child_samples,
                             min_child_weight=min_child_weight)
+    # recover to original feature value
+    split_values = [r[f] for r in rows if not math.isnan(r[split.feature])]
+    split_values_lo,split_values_hi=min(split_values),max(split_values)
+    split_values_width=(split_values_hi-split_values_lo)/max_bins
+    split_threshold =split_values_lo + split_values_width * (split.threshold+1)
+    return SplitResult(split.feature, split_threshold, split.gain,
+                       split.missing_left, split.left_count, split.right_count);
 
 
 def split_rows(rows,split):

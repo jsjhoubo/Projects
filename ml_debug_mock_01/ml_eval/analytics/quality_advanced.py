@@ -5,6 +5,7 @@ metric shifts as model or evaluation bugs, not as an invitation to change tests.
 """
 from __future__ import annotations
 from collections import defaultdict
+import heapq
 import math
 
 
@@ -24,7 +25,9 @@ def group_map_at_k(rows, k=10, *, query_key="query_id",
         return 0.0
     total=0.0
     for entries in groups.values():
-        ranked=sorted(entries,key=lambda r:(-r[1][score_key],r[0]))[:k]
+        ranked=heapq.nsmallest(
+            k, entries, key=lambda r: (-r[1][score_key], r[0])
+        )
         positives=sum(int(row[label_key]>0) for _,row in entries)
         if positives == 0:
             continue
@@ -49,7 +52,9 @@ def group_mrr_at_k(rows,k=10,*,query_key="query_id",
     if not groups:return 0.0
     result=0.0
     for entries in groups.values():
-        ranked=sorted(entries,key=lambda t:(-t[1][score_key],t[0]))[:k]
+        ranked=heapq.nsmallest(
+            k, entries, key=lambda t: (-t[1][score_key], t[0])
+        )
         for i,(_,row) in enumerate(ranked,1):
             if row[label_key]>0:
                 result+=1/i

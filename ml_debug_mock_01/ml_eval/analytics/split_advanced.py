@@ -50,7 +50,7 @@ def temporal_event_split(records, cutoff, *, time_key="event_time"):
     """Events before cutoff go to train; cutoff and later go to validation."""
     train, validation = [], []
     for record in records:
-        if record[time_key] <= cutoff:
+        if record[time_key] < cutoff:
             train.append(record)
         else:
             validation.append(record)
@@ -70,7 +70,7 @@ def purged_temporal_split(records, cutoff, *, time_key="event_time",
     train, val = [], []
     for record in records:
         t = record[time_key]
-        if t < cutoff:
+        if t < cutoff and record[label_end_key] <= cutoff:
             train.append(record)
         elif t >= cutoff + embargo:
             val.append(record)
@@ -104,5 +104,5 @@ def rolling_origin_splits(records, cutoffs, *, time_key="event_time",
     records = list(records)
     for cutoff in cutoffs:
         train = [r for r in records if r[time_key] < cutoff]
-        validation = [r for r in records if r[time_key] <= cutoff + horizon]
+        validation = [r for r in records if r[time_key] < cutoff + horizon and r[time_key] >=cutoff]
         yield train, validation
