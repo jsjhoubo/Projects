@@ -68,7 +68,8 @@ def test_group_folds_never_split_a_group_across_folds():
 
 
 def test_stratified_split_preserves_all_items_and_per_class_counts():
-    items = [{"id":i,"label":i%3} for i in range( ninety := 90)]
+    ninety = 90
+    items = [{"id":i,"label":i%3} for i in range(ninety)]
     left,right = sampling.stratified_partition(items,lambda r:r["label"],0.7,seed=7)
     assert sorted(r["id"] for r in left+right) == list(range(ninety))
     for label in range(3):
