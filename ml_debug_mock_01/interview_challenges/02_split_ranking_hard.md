@@ -33,6 +33,45 @@ Tests encode observable contracts, not implementation details. Preserve the publ
 python -m pytest tests/test_ranking_advanced.py -vv
 ```
 
+## Task D: Decision Tree / GBDT best-split algorithm debugging (45–60 min)
+
+**This is TREE NODE SPLIT, not Train/Test dataset splitting.**
+
+Read `ml_eval/analytics/tree_split.py` and `tests/test_tree_split.py`.
+The inherited exact-search and histogram implementations should implement a
+regularized second-order boosting split objective. Some subtle correctness and
+representation defects may be present; your job is to isolate them, build
+counterexamples, and restore the specified behavior without changing tests.
+
+Required behavior:
+- Exact numeric threshold scan should respect distinct feature values and
+  stable tie-breaking, never split equal feature values across two children.
+- Gain must equal the child-score improvement over the unsplit parent, with
+  `reg_lambda`, `gamma`, and `min_child_weight` handled consistently.
+- Evaluate both NaN default directions when present; enforce child row counts
+  and Hessian constraints on actual routed records.
+- Histogram-based split may be approximate in WHICH cut it selects, but the
+  returned threshold, child counts and gain must agree with routing on the
+  **original input features**. Exact and histogram search need not select the
+  same threshold.
+- Reject invalid dimensions and non-finite inputs appropriately, without
+  mutating data.
+- Performance follow-up: compare repeated full scans with one-time ordering,
+  prefix statistics, histogram aggregation and efficient bin cut searches.
+  Include exactness/approximation trade-offs, tie stability, allocations and
+  skewed distributions; use measured before/after runtime.
+
+Run only Tree Split tests:
+
+```bash
+python -m pytest tests/test_tree_split.py -vv
+```
+
+Read the tests as behavioral checks, not a solution. For any unexpected
+assertion, verify it against the documented mathematical contract before
+changing implementation. Do not submit a replacement algorithm by default:
+prioritize small root-cause fixes to existing code.
+
 ## Task C: Performance engineering (45–60 min)
 Benchmark the same implementations on 100K–1M synthetic candidates and events. Focus on end-to-end wall time, peak memory, regression correctness and the true computational bottleneck, not merely algorithm names. Consider sorting versus heap-based selection, stable tie handling, copying costs, and worst-case skew.
 
