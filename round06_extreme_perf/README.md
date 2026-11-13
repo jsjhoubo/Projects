@@ -6,6 +6,16 @@ Resolution interview format (read a low-quality PyTorch Colab and explain
 performance improvements) with harder implementation, differential regression,
 profiling and benchmark requirements.
 
+## Google Colab GPU workbench
+
+Open [01_gpu_workbench.ipynb](notebooks/01_gpu_workbench.ipynb) in Google Colab
+([launch Colab](https://colab.research.google.com/github/jsjhoubo/Projects/blob/interview/06-extreme-perf/round06_extreme_perf/notebooks/01_gpu_workbench.ipynb)).
+Select **Runtime → Change runtime type → GPU** first, then run cells to
+clone the full repo, check CUDA, run regression tests, profile attention/training,
+and save measurements. This notebook launches the full codebase instead of
+flattening 8,404 Python LOC into one notebook.
+For the blind review round use [00_blind_review.ipynb](notebooks/00_blind_review.ipynb).
+
 ## What you are handed
 
 You inherit a small causal language-model training and serving repository.
