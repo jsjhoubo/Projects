@@ -27,9 +27,11 @@ def join_latest_features(impressions, feature_events, *,
         match=None
         for candidate in index.get(key,()):
             if candidate[feature_time]<=ts:
-                match=candidate
+                if candidate[arrival_time] <=ts:
+                    match=candidate
             else:
                 break
+        #if match is not None:
         results.append({"impression":event,"feature":match})
     return results
 
@@ -49,7 +51,7 @@ def rolling_user_ctr(events, *, entity_key="user_id", time_key="event_time",
         user=event[entity_key]
         series=history[user]
         series.append(int(event[label_key]))
-        recent=series[-window:]
+        recent=series[-(window+1):-1]
         result[index]=sum(recent)/len(recent) if recent else 0.0
     return result
 
@@ -65,7 +67,8 @@ def time_based_train_test(events, cutoff, *, time_key="event_time",
     test=[]
     for row in events:
         if row[time_key]<cutoff:
-            train.append(row)
+            if row[label_time_key] <cutoff:
+                train.append(row)
         else:
             test.append(row)
     return train,test
