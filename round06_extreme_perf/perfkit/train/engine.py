@@ -20,11 +20,13 @@ class TrainStep:
     gradient_summary: dict
 
 class ResearchTrainer:
-    def __init__(self,model,optimizer,device='cpu',diagnostics=True,backend='research'):
+    def __init__(self,model,optimizer,device='cpu',diagnostics=True,backend='research',diagnostics_interval=3):
         self.model=model
         self.optimizer=optimizer
         self.device=torch.device(device)
         self.diagnostics=diagnostics
+        if diagnostics_interval < 1:raise ValueError('diagnostics_interval must be >= 1')
+        self.diagnostics_interval=diagnostics_interval
         self.backend=backend
         self.steps=0
 
@@ -44,7 +46,9 @@ class ResearchTrainer:
             loss.backward()
             total+=float(loss.item())
             token_count+=batch.useful_tokens
-        stats=inspect_gradients(self.model) if self.diagnostics else {}
+        # Diagnostics run every N training steps; clipping remains every step.
+        should_inspect=self.diagnostics and (self.steps+1)%self.diagnostics_interval==0
+        stats=inspect_gradients(self.model) if should_inspect else {}
         clip_gradients(self.model,clip_norm)
         self.optimizer.step()
         self.steps+=1
